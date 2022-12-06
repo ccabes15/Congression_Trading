@@ -1,0 +1,77 @@
+---
+title: "Congressional Stock Trading Trends"
+author: "Connor Cabrey"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    number_sections: yes
+    toc: yes
+always_allow_html: true
+bibliography: gov_670_project.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+library(tinytex)
+library(plotly)
+library(janitor)
+library(lubridate)
+```
+
+\newpage
+
+# Introduction
+
+Stock trading and investing can be lucrative ways to make money without much effort. Especially within the last two years, so-called retail investors (individuals who buy/sell securities as a non-professional) have begun to see more news with their influence on the market. As a part of this surge in retail investing, more interest has been shown to the investments of our elected political officials. Rep. Nancy Pelosi is known as one of the savviest investors in congress. She consistently outperforms the market and in Q4 of 2021, her portfolio grew over 96% gaining over \$62 million [@fineprint2021]. This level of investing seems impressive, but to many, the trades our congressional representatives make could be tainted by their influence over policy. There were many articles written during the initial CoVID-19 wave about the insider-trading done by representatives who knew that the pandemic was coming before mainstream media, and used it as an opportunity to make obscene amounts of money. From the Wake Forest Law Review, Senator Richard Burr made over \$600,000 dumping personal holdings in early February, after making a speech one week earlier about how the "United Stats today is better prepared than ever before to face emerging public health threats." This dump in personal holdings occurred just one week before the stock markets began to trend downward in response to the spread of the coronavirus [@congress]. All of these articles and the continued growth of retail investing has lead me to want to investigate the trends in congressional stock trading, especially in conjunction with their influence over public policy that has the potential to create massive profit.
+
+# Data Collection
+
+The data I am using comes from housestockwatcher.com [@officeo]. This website uses an api to collect the data from Clerks of the United States House of Representatives public disclosure website. From the Clerks website, "Members, officers, and staff of the U.S. House of Representatives are required by certain House Rules and federal statutes to file official documents on travel, income, gifts, etc. and to make this information available to the public as Public Disclosure documents."
+
+```{r Data Download, include=FALSE}
+stock_data <- read_csv(file = "https://house-stock-watcher-data.s3-us-west-2.amazonaws.com/data/all_transactions.csv")
+```
+
+Below is the initial raw data from the website. There are 12 variables initially: disclosure_year, disclosure_date, transaction_data, owner, ticker, asset_description, type, amount, representative, district, ptr_link, and cap_gains_over_200_USD. Initial exploration of the breakdown of trades is interesting. The vast majority of trades are the two lowest categories (1001-15000 and 15001-50000).
+
+```{r echo=FALSE}
+head(stock_data)
+```
+
+```{r echo=FALSE}
+values <- stock_data %>%
+    filter(type == "purchase") %>% 
+    group_by(amount) %>%
+    summarize(count = n())
+
+ggplot(data = values, aes(x="", y = count, fill = amount))+
+  geom_bar(stat="identity", width=1) +
+  coord_polar("y", start=0)+
+  theme_void()
+```
+
+## Cleaning the Data
+
+From here, I would like to clean the data set up. Make the dates dates, and then split the amount into a lower and upper bound limit. Right now it is kind of clunky and I'm not sure if it should be a category or treated as an amount since they don't disclose the actual amount, just the range within which it falls.
+
+```{r}
+#Parse Dates
+stock_data <- stock_data %>% 
+  mutate(transaction_date = parse_date(transaction_date, format = "%Y-%m-%d"),
+         disclosure_date = parse_date(disclosure_date, format = "%m/%d/%Y"))
+
+
+  
+  
+```
+
+
+# Path Forward
+
+Next I'd like to look at a snapshot of the data in reference to important legislation passed within the last three years. I want to categorize the legislation similar to an ETF. Create buckets of technology stocks, healthcare, energy, and other broad categories. Then I'd like to categorize these stocks as well, and look at how the number of trades within those categories changes with relation to the lead-up of the bill passage
+
+\newpage
+
+# References
