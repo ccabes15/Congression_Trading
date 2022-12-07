@@ -285,7 +285,7 @@ for (i in 1:218) {
    daily_trading_average <- 15.89
    x <- stock_data_clean %>% 
      filter(between(transaction_date, as.Date(left_date), as.Date(date_))) 
-    ggplot(data = x)+
+    plot.1 <- ggplot(data = x)+
       geom_bar(mapping = aes(x = transaction_date, fill = amount_cat))+
       ggtitle(date_)+
       xlab("Transaction Date")+
@@ -293,14 +293,30 @@ for (i in 1:218) {
       geom_hline(yintercept = daily_trading_average)+
       scale_fill_discrete(name = "Amount Category")
     
-    #values <- x %>%
-    #group_by(amount_cat) %>%
-    #summarize(count = n())
+    values <- x %>%
+      group_by(amount_cat) %>%
+      summarize(count = n())
 
- # ggplot(data = values, aes(x="", y = count, fill = amount_cat))+
-    #geom_bar(stat="identity", width=1) +
-    #coord_polar("y", start=0)+
-    #theme_void()
+    plot.2 <- ggplot(data = values, aes(x="", y = count, fill = amount_cat))+
+      geom_bar(stat="identity", width=1) +
+      coord_polar("y", start=0)+
+      theme_void()+
+      ggtitle("Breakdown by Amount Category")+
+      scale_fill_discrete(name = "Amount Category")
+    
+    # plot.3 <- x %>% 
+    #   group_by(ticker) %>% 
+    #   summarize(count = n()) %>% 
+    #   filter(count > 2) %>% 
+    #   ggplot()+
+    #     geom_bar(mapping = aes(x = ticker))+
+    #     ggtitle(date_)+
+    #     xlab("Stock Ticker")+
+    #     ylab("Count")
+   
+   print(plot.1)
+   print(plot.2)
+   # print(plot.3)
  }
 ```
 
