@@ -56,17 +56,163 @@ ggplot(data = values, aes(x="", y = count, fill = amount))+
 
 From here, I would like to clean the data set up. Make the dates dates, and then split the amount into a lower and upper bound limit. Right now it is kind of clunky and I'm not sure if it should be a category or treated as an amount since they don't disclose the actual amount, just the range within which it falls.
 
-```{r}
+```{r warning=FALSE}
 #Parse Dates
-stock_data <- stock_data %>% 
+stock_data_clean <- stock_data %>% 
   mutate(transaction_date = parse_date(transaction_date, format = "%Y-%m-%d"),
-         disclosure_date = parse_date(disclosure_date, format = "%m/%d/%Y"))
-
-
+         disclosure_date = parse_date(disclosure_date, format = "%m/%d/%Y")) %>% 
+  filter(transaction_date > "2018-01-01") %>% 
+#Here purchases are made 1's, sales are made 0's
+  mutate(type = if_else(type == "purchase",1, 0)) %>% 
+  separate(col = "amount", into = c("lower_amount", "upper_amount"), sep = "-") %>% 
+  mutate(lower_amount = parse_number(lower_amount),
+         upper_amount = parse_number(upper_amount)) %>% 
+  mutate(amount_cat = case_when(is.na(upper_amount) ~ 1,
+                                upper_amount <= 15000 ~ 1,
+                                upper_amount <= 50000 ~ 2,
+                                upper_amount <= 100000 ~ 3,
+                                upper_amount > 100000 ~ 4)) %>% 
+  #cat 1 is less than 15k, cat 2 is less than 50k, cat 3 is less than 100k, cat 4 is more than 100k
+  dplyr::select(-c(district, ptr_link, lower_amount, upper_amount, cap_gains_over_200_usd, disclosure_year, owner)) %>% 
+  mutate(ticker = as.character(gsub('[--]', '', ticker)),
+         ticker = as.character(gsub("^$|^ $", NA, ticker))) %>% 
+  filter(ticker != "NA")
   
-  
+
 ```
 
+```{r}
+#Calculating Average Trading Volume by Day
+trading_volume_by_day <- stock_data_clean %>% 
+  group_by(transaction_date) %>% 
+  count()
+
+median(trading_volume_by_day$n)
+daily_trading_average <- mean(trading_volume_by_day$n)
+
+trading_days_of_interest <- trading_volume_by_day %>% 
+  filter(n > daily_trading_average) %>% 
+  select(transaction_date)
+```
+
+
+```{r}
+#This is vote data for Bill Passages during the timeframe of the data
+vote_data <- read_csv(file = "../Data/Hall_rollcalls.csv")
+
+vote_data_clean <- vote_data %>% 
+  mutate(date = parse_date(date, format = "%m/%d/%Y")) %>% 
+  filter(date > "2018-01-01") %>% 
+  select(-c(chamber, clerk_rollnumber, yea_count, nay_count, nominate_mid_1, nominate_mid_2, nominate_spread_1, nominate_spread_2, nominate_log_likelihood, bill_number, vote_result, dtl_desc, rollnumber, session)) %>% 
+  filter(vote_question == "On Passage")
+```
+
+```{r}
+vote_days_of_interest <- vote_data_clean %>% 
+  filter(date %in% trading_days_of_interest$transaction_date)
+```
+
+
+```{r}
+#This plot shows bill passage votes as v-lines over the daily stock trading volume by congressional representatives
+ggplot()+
+  geom_point(data = trading_volume_by_day, mapping = aes(x = transaction_date, y = n))+
+  geom_vline(data = vote_days_of_interest,
+             aes(xintercept = date,
+                color = "red"))
+```
+
+
+# Plots by Year
+```{r}
+stock_data_clean %>%
+  filter(transaction_date %in% trading_days_of_interest$transaction_date) %>% 
+  group_by(transaction_date) %>% 
+  filter(between(transaction_date, as.Date('2018-01-01'), as.Date('2018-12-31'))) %>% 
+  ggplot()+
+    geom_bar(mapping = aes(x = transaction_date))+
+    geom_vline(data = vote_days_of_interest,
+             aes(xintercept = date,
+                color = "red"))+
+    geom_hline(yintercept = daily_trading_average, color = "blue")+
+    labs(x = "Transaction Date", y = "Count", title = "2018 Daily Trading Averages") +
+    scale_fill_discrete(name = "Color", labels = "Vote Passage Day")
+```
+
+```{r}
+
+stock_data_clean %>%
+  filter(transaction_date %in% trading_days_of_interest$transaction_date) %>% 
+  group_by(transaction_date) %>% 
+  filter(between(transaction_date, as.Date('2019-01-01'), as.Date('2019-12-31'))) %>% 
+  ggplot()+
+    geom_bar(mapping = aes(x = transaction_date))+
+    geom_vline(data = vote_days_of_interest,
+             aes(xintercept = date,
+                color = "red"))+
+    geom_hline(yintercept = daily_trading_average, color = "blue")+
+    labs(x = "Transaction Date", y = "Count", title = "2019 Daily Trading Averages") +
+    scale_fill_discrete(name = "Color", labels = "Vote Passage Day")
+
+```
+
+```{r}
+
+stock_data_clean %>%
+  filter(transaction_date %in% trading_days_of_interest$transaction_date) %>% 
+  group_by(transaction_date) %>% 
+  filter(between(transaction_date, as.Date('2020-01-01'), as.Date('2020-12-31'))) %>% 
+  ggplot()+
+    geom_bar(mapping = aes(x = transaction_date))+
+    geom_vline(data = vote_days_of_interest,
+             aes(xintercept = date,
+                color = "red"))+
+    geom_hline(yintercept = daily_trading_average, color = "blue")+
+    labs(x = "Transaction Date", y = "Count", title = "2020 Daily Trading Averages") +
+    scale_fill_discrete(name = "Color", labels = "Vote Passage Day")
+
+```
+
+```{r}
+
+stock_data_clean %>%
+  filter(transaction_date %in% trading_days_of_interest$transaction_date) %>% 
+  group_by(transaction_date) %>% 
+  filter(between(transaction_date, as.Date('2021-01-01'), as.Date('2021-12-31'))) %>% 
+  ggplot()+
+    geom_bar(mapping = aes(x = transaction_date))+
+    geom_vline(data = vote_days_of_interest,
+             aes(xintercept = date,
+                color = "red"))+
+    geom_hline(yintercept = daily_trading_average, color = "blue")+
+    labs(x = "Transaction Date", y = "Count", title = "2021 Daily Trading Averages") +
+    scale_fill_discrete(name = "Color", labels = "Vote Passage Day")
+
+```
+
+```{r}
+
+stock_data_clean %>%
+  filter(transaction_date %in% trading_days_of_interest$transaction_date) %>% 
+  group_by(transaction_date) %>% 
+  filter(between(transaction_date, as.Date('2022-01-01'), as.Date('2022-12-31'))) %>% 
+  ggplot()+
+    geom_bar(mapping = aes(x = transaction_date))+
+    geom_vline(data = vote_days_of_interest,
+             aes(xintercept = date,
+                color = "red"))+
+    geom_hline(yintercept = daily_trading_average, color = "blue")+
+    labs(x = "Transaction Date", y = "Count", title = "2022 Daily Trading Averages") +
+    scale_fill_discrete(name = "Color", labels = "Vote Passage Day")
+
+```
+
+# Identfying Bills Voted on For High Trading Volume Days
+```{r}
+vote_data_clean %>% 
+  filter(date %in% trading_days_of_interest$transaction_date) %>% 
+  select(vote_desc)
+```
 
 # Path Forward
 
