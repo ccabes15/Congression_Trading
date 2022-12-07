@@ -36,22 +36,6 @@ stock_data <- read_csv(file = "https://house-stock-watcher-data.s3-us-west-2.ama
 
 Below is the initial raw data from the website. There are 12 variables initially: disclosure_year, disclosure_date, transaction_data, owner, ticker, asset_description, type, amount, representative, district, ptr_link, and cap_gains_over_200_USD. Initial exploration of the breakdown of trades is interesting. The vast majority of trades are the two lowest categories (1001-15000 and 15001-50000).
 
-```{r echo=FALSE}
-head(stock_data)
-```
-
-```{r echo=FALSE}
-values <- stock_data %>%
-    filter(type == "purchase") %>% 
-    group_by(amount) %>%
-    summarize(count = n())
-
-ggplot(data = values, aes(x="", y = count, fill = amount))+
-  geom_bar(stat="identity", width=1) +
-  coord_polar("y", start=0)+
-  theme_void()
-```
-
 ## Cleaning the Data
 
 From here, I would like to clean the data set up. Make the dates dates, and then split the amount into a lower and upper bound limit. Right now it is kind of clunky and I'm not sure if it should be a category or treated as an amount since they don't disclose the actual amount, just the range within which it falls.
