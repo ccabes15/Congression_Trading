@@ -56,6 +56,7 @@ ggplot(data = values, aes(x="", y = count, fill = amount))+
 
 From here, I would like to clean the data set up. Make the dates dates, and then split the amount into a lower and upper bound limit. Right now it is kind of clunky and I'm not sure if it should be a category or treated as an amount since they don't disclose the actual amount, just the range within which it falls.
 
+### Stock Data
 ```{r warning=FALSE}
 #Parse Dates
 stock_data_clean <- stock_data %>% 
@@ -95,7 +96,7 @@ trading_days_of_interest <- trading_volume_by_day %>%
   select(transaction_date)
 ```
 
-
+### Vote Data
 ```{r}
 #This is vote data for Bill Passages during the timeframe of the data
 vote_data <- read_csv(file = "../Data/Hall_rollcalls.csv")
@@ -103,7 +104,7 @@ vote_data <- read_csv(file = "../Data/Hall_rollcalls.csv")
 vote_data_clean <- vote_data %>% 
   mutate(date = parse_date(date, format = "%m/%d/%Y")) %>% 
   filter(date > "2018-01-01") %>% 
-  select(-c(chamber, clerk_rollnumber, yea_count, nay_count, nominate_mid_1, nominate_mid_2, nominate_spread_1, nominate_spread_2, nominate_log_likelihood, bill_number, vote_result, dtl_desc, rollnumber, session)) %>% 
+  select(-c(chamber, clerk_rollnumber, yea_count, nay_count, nominate_mid_1, nominate_mid_2, nominate_spread_1, nominate_spread_2, nominate_log_likelihood, vote_result, dtl_desc, rollnumber, session)) %>% 
   filter(vote_question == "On Passage")
 ```
 
@@ -119,11 +120,15 @@ ggplot()+
   geom_point(data = trading_volume_by_day, mapping = aes(x = transaction_date, y = n))+
   geom_vline(data = vote_days_of_interest,
              aes(xintercept = date,
-                color = "red"))
+                color = "red")) +
+  theme(legend.position = "none")
+  
 ```
 
 
 # Plots by Year
+
+## 2018 Plot
 ```{r}
 stock_data_clean %>%
   filter(transaction_date %in% trading_days_of_interest$transaction_date) %>% 
@@ -136,9 +141,11 @@ stock_data_clean %>%
                 color = "red"))+
     geom_hline(yintercept = daily_trading_average, color = "blue")+
     labs(x = "Transaction Date", y = "Count", title = "2018 Daily Trading Averages") +
-    scale_fill_discrete(name = "Color", labels = "Vote Passage Day")
+    scale_fill_discrete(name = "Color", labels = "Vote Passage Day")+
+    theme(legend.position = "none")
 ```
 
+## 2019 Plot
 ```{r}
 
 stock_data_clean %>%
@@ -152,10 +159,12 @@ stock_data_clean %>%
                 color = "red"))+
     geom_hline(yintercept = daily_trading_average, color = "blue")+
     labs(x = "Transaction Date", y = "Count", title = "2019 Daily Trading Averages") +
-    scale_fill_discrete(name = "Color", labels = "Vote Passage Day")
+    scale_fill_discrete(name = "Color", labels = "Vote Passage Day")+
+    theme(legend.position = "none")
 
 ```
 
+## 2020 Plot
 ```{r}
 
 stock_data_clean %>%
@@ -169,10 +178,12 @@ stock_data_clean %>%
                 color = "red"))+
     geom_hline(yintercept = daily_trading_average, color = "blue")+
     labs(x = "Transaction Date", y = "Count", title = "2020 Daily Trading Averages") +
-    scale_fill_discrete(name = "Color", labels = "Vote Passage Day")
+    scale_fill_discrete(name = "Color", labels = "Vote Passage Day")+
+    theme(legend.position = "none")
 
 ```
 
+## 2021 Plot
 ```{r}
 
 stock_data_clean %>%
@@ -186,10 +197,12 @@ stock_data_clean %>%
                 color = "red"))+
     geom_hline(yintercept = daily_trading_average, color = "blue")+
     labs(x = "Transaction Date", y = "Count", title = "2021 Daily Trading Averages") +
-    scale_fill_discrete(name = "Color", labels = "Vote Passage Day")
+    scale_fill_discrete(name = "Color", labels = "Vote Passage Day") +
+    theme(legend.position = "none")
 
 ```
 
+## 2022 Plot
 ```{r}
 
 stock_data_clean %>%
@@ -203,15 +216,50 @@ stock_data_clean %>%
                 color = "red"))+
     geom_hline(yintercept = daily_trading_average, color = "blue")+
     labs(x = "Transaction Date", y = "Count", title = "2022 Daily Trading Averages") +
-    scale_fill_discrete(name = "Color", labels = "Vote Passage Day")
+    scale_fill_discrete(name = "Color", labels = "Vote Passage Day") + 
+    theme(legend.position = "none")
 
 ```
 
 # Identfying Bills Voted on For High Trading Volume Days
 ```{r}
-vote_data_clean %>% 
+bill_passages_of_interest <- vote_data_clean %>% 
   filter(date %in% trading_days_of_interest$transaction_date) %>% 
-  select(vote_desc)
+  select(c(date, vote_desc)) %>% 
+  left_join(vote_data_clean) %>% 
+  select(date, bill_number, vote_desc)
+
+bill_numbers_list <- as.list(bill_passages_of_interest$bill_number)
+bill_passage_dates <- bill_passages_of_interest$date
+
+date_ranges <- bill_passages_of_interest %>% 
+  mutate(left_date = date - days(30)) %>% 
+  select(-c(bill_number, vote_desc))
+
+```
+
+# Trading Volume 30 Days Before Vote Passage
+
+```{r}
+vote_plots <- list()
+left_dates <- unique(date_ranges$left_date)
+main_date <- unique(date_ranges$date)
+
+stock_data_clean %>%
+    group_by(transaction_date) %>% 
+    filter(between(transaction_date, as.Date(date_ranges$left_date[1]), as.Date(date_ranges$date[1]))) %>% 
+    ggplot()+
+    geom_bar(mapping = aes(x = transaction_date))
+
+for (i in 1:51) {
+  x <- stock_data_clean %>%
+    group_by(transaction_date) %>% 
+    filter(between(transaction_date, as.Date(left_dates[i]), as.Date(main_date[i])))
+  vote_plots[[dates]] = ggplot(data = x) + geom_bar(mapping = aes(x = transaction_date)) + ggtitle(main_date[i]) + xlab("Transaction Date") + ylab("Count") + geom_hline(yintercept = daily_trading_average, color = "blue")
+  print(vote_plots[[dates]])
+}
+
+
 ```
 
 # Path Forward
