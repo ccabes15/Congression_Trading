@@ -236,14 +236,20 @@ date_ranges <- bill_passages_of_interest %>%
   mutate(left_date = date - days(30)) %>% 
   select(-c(bill_number, vote_desc))
 
+date_ranges_full <- vote_data_clean %>% 
+  mutate(left_date = date - days(30))
+
 ```
 
 # Trading Volume 30 Days Before Vote Passage
 
 ```{r}
 vote_plots <- list()
-left_dates <- unique(date_ranges$left_date)
-main_date <- unique(date_ranges$date)
+left_dates <- unique(date_ranges_full$left_date)
+main_date <- unique(date_ranges_full$date)
+
+bills_passed <- date_ranges_full %>% 
+  filter()
 
 stock_data_clean %>%
     group_by(transaction_date) %>% 
@@ -251,12 +257,13 @@ stock_data_clean %>%
     ggplot()+
     geom_bar(mapping = aes(x = transaction_date))
 
-for (i in 1:51) {
+for (i in 1:218) {
   x <- stock_data_clean %>%
     group_by(transaction_date) %>% 
     filter(between(transaction_date, as.Date(left_dates[i]), as.Date(main_date[i])))
   vote_plots[[dates]] = ggplot(data = x) + geom_bar(mapping = aes(x = transaction_date)) + ggtitle(main_date[i]) + xlab("Transaction Date") + ylab("Count") + geom_hline(yintercept = daily_trading_average, color = "blue")
   print(vote_plots[[dates]])
+  ggsave(vote_plots[[dates]], file = paste0("../Plots/", "plot_", main_date[i], ".png"), width = 44.45, height = 27.78, units = "cm", dpi=300)
 }
 
 
