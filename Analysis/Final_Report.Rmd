@@ -116,13 +116,16 @@ vote_days_of_interest <- vote_data_clean %>%
 
 ```{r}
 #This plot shows bill passage votes as v-lines over the daily stock trading volume by congressional representatives
-ggplot()+
-  geom_point(data = trading_volume_by_day, mapping = aes(x = transaction_date, y = n))+
-  geom_vline(data = vote_days_of_interest,
-             aes(xintercept = date,
-                color = "red")) +
-  theme(legend.position = "none")
-  
+plot1 <- stock_data_clean %>% 
+  group_by(transaction_date) %>% 
+  ggplot()+
+    geom_bar(mapping = aes(x = transaction_date))+
+    geom_vline(data = vote_data_clean,
+               aes(xintercept = date,
+                  color = "red")) +
+    theme(legend.position = "none")
+
+ggsave(filename = "plot1.png", plot = plot1, width = 44.45, height = 27.78, units = "cm", dpi=300)
 ```
 
 
@@ -130,7 +133,7 @@ ggplot()+
 
 ## 2018 Plot
 ```{r}
-stock_data_clean %>%
+plot2 <- stock_data_clean %>%
   filter(transaction_date %in% trading_days_of_interest$transaction_date) %>% 
   group_by(transaction_date) %>% 
   filter(between(transaction_date, as.Date('2018-01-01'), as.Date('2018-12-31'))) %>% 
@@ -143,12 +146,14 @@ stock_data_clean %>%
     labs(x = "Transaction Date", y = "Count", title = "2018 Daily Trading Averages") +
     scale_fill_discrete(name = "Color", labels = "Vote Passage Day")+
     theme(legend.position = "none")
+
+ggsave(filename = "../Plots/plot2.png", plot = plot2, width = 44.45, height = 27.78, units = "cm", dpi=300)
 ```
 
 ## 2019 Plot
 ```{r}
 
-stock_data_clean %>%
+plot3 <- stock_data_clean %>%
   filter(transaction_date %in% trading_days_of_interest$transaction_date) %>% 
   group_by(transaction_date) %>% 
   filter(between(transaction_date, as.Date('2019-01-01'), as.Date('2019-12-31'))) %>% 
@@ -162,12 +167,14 @@ stock_data_clean %>%
     scale_fill_discrete(name = "Color", labels = "Vote Passage Day")+
     theme(legend.position = "none")
 
+ggsave(filename = "../Plots/plot3.png", plot = plot3, width = 44.45, height = 27.78, units = "cm", dpi=300)
+
 ```
 
 ## 2020 Plot
 ```{r}
 
-stock_data_clean %>%
+plot4 <- stock_data_clean %>%
   filter(transaction_date %in% trading_days_of_interest$transaction_date) %>% 
   group_by(transaction_date) %>% 
   filter(between(transaction_date, as.Date('2020-01-01'), as.Date('2020-12-31'))) %>% 
@@ -181,12 +188,14 @@ stock_data_clean %>%
     scale_fill_discrete(name = "Color", labels = "Vote Passage Day")+
     theme(legend.position = "none")
 
+ggsave(filename = "../Plots/plot4.png", plot = plot4, width = 44.45, height = 27.78, units = "cm", dpi=300)
+
 ```
 
 ## 2021 Plot
 ```{r}
 
-stock_data_clean %>%
+plot5 <- stock_data_clean %>%
   filter(transaction_date %in% trading_days_of_interest$transaction_date) %>% 
   group_by(transaction_date) %>% 
   filter(between(transaction_date, as.Date('2021-01-01'), as.Date('2021-12-31'))) %>% 
@@ -200,12 +209,14 @@ stock_data_clean %>%
     scale_fill_discrete(name = "Color", labels = "Vote Passage Day") +
     theme(legend.position = "none")
 
+ggsave(filename = "../Plots/plot5.png", plot = plot5, width = 44.45, height = 27.78, units = "cm", dpi=300)
+
 ```
 
 ## 2022 Plot
 ```{r}
 
-stock_data_clean %>%
+plot6 <- stock_data_clean %>%
   filter(transaction_date %in% trading_days_of_interest$transaction_date) %>% 
   group_by(transaction_date) %>% 
   filter(between(transaction_date, as.Date('2022-01-01'), as.Date('2022-12-31'))) %>% 
@@ -219,6 +230,7 @@ stock_data_clean %>%
     scale_fill_discrete(name = "Color", labels = "Vote Passage Day") + 
     theme(legend.position = "none")
 
+ggsave(filename = "../Plots/plot6.png", plot = plot6, width = 44.45, height = 27.78, units = "cm", dpi=300)
 ```
 
 # Identfying Bills Voted on For High Trading Volume Days
@@ -247,9 +259,6 @@ date_ranges_full <- vote_data_clean %>%
 vote_plots <- list()
 left_dates <- unique(date_ranges_full$left_date)
 main_date <- unique(date_ranges_full$date)
-
-bills_passed <- date_ranges_full %>% 
-  filter()
 
 stock_data_clean %>%
     group_by(transaction_date) %>% 
