@@ -73,6 +73,7 @@ stock_data_clean <- stock_data %>%
                                 upper_amount <= 50000 ~ 2,
                                 upper_amount <= 100000 ~ 3,
                                 upper_amount > 100000 ~ 4)) %>% 
+  mutate(amount_cat = as.factor(amount_cat)) %>% 
   #cat 1 is less than 15k, cat 2 is less than 50k, cat 3 is less than 100k, cat 4 is more than 100k
   dplyr::select(-c(district, ptr_link, lower_amount, upper_amount, cap_gains_over_200_usd, disclosure_year, owner)) %>% 
   mutate(ticker = as.character(gsub('[--]', '', ticker)),
@@ -277,6 +278,32 @@ for (i in 1:218) {
 
 
 ```
+
+```{r}
+ monthly_trade_vol <- function(date_){
+   left_date <- as.Date(date_) - days(30)
+   daily_trading_average <- 15.89
+   x <- stock_data_clean %>% 
+     filter(between(transaction_date, as.Date(left_date), as.Date(date_))) 
+    ggplot(data = x)+
+      geom_bar(mapping = aes(x = transaction_date, fill = amount_cat))+
+      ggtitle(date_)+
+      xlab("Transaction Date")+
+      ylab("Count")+
+      geom_hline(yintercept = daily_trading_average)+
+      scale_fill_discrete(name = "Amount Category")
+    
+    #values <- x %>%
+    #group_by(amount_cat) %>%
+    #summarize(count = n())
+
+ # ggplot(data = values, aes(x="", y = count, fill = amount_cat))+
+    #geom_bar(stat="identity", width=1) +
+    #coord_polar("y", start=0)+
+    #theme_void()
+ }
+```
+
 
 # Path Forward
 
