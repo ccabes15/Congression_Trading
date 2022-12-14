@@ -12,26 +12,38 @@ bibliography: gov_670_project.bib
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)
+
 library(ggplot2)
 library(tinytex)
-library(plotly)
 library(janitor)
 library(lubridate)
+library(tidyverse)
 ```
 
 \newpage
 
-# Introduction
+# Issue
 
-Stock trading and investing can be lucrative ways to make money without much effort. Especially within the last two years, so-called retail investors (individuals who buy/sell securities as a non-professional) have begun to see more news with their influence on the market. As a part of this surge in retail investing, more interest has been shown to the investments of our elected political officials. Rep. Nancy Pelosi is known as one of the savviest investors in congress. She consistently outperforms the market and in Q4 of 2021, her portfolio grew over 96% gaining over \$62 million [@fineprint2021]. This level of investing seems impressive, but to many, the trades our congressional representatives make could be tainted by their influence over policy. There were many articles written during the initial CoVID-19 wave about the insider-trading done by representatives who knew that the pandemic was coming before mainstream media, and used it as an opportunity to make obscene amounts of money. From the Wake Forest Law Review, Senator Richard Burr made over \$600,000 dumping personal holdings in early February, after making a speech one week earlier about how the "United Stats today is better prepared than ever before to face emerging public health threats." This dump in personal holdings occurred just one week before the stock markets began to trend downward in response to the spread of the coronavirus [@congress]. All of these articles and the continued growth of retail investing has lead me to want to investigate the trends in congressional stock trading, especially in conjunction with their influence over public policy that has the potential to create massive profit.
+Stock trading and investing can be lucrative ways to make money without much effort. Especially within the last two years, so-called retail investors (individuals who buy/sell securities as a non-professional) have begun to see more news with their influence on the market. With the development of easy trading technology and apps such as Robinhood, it is now easier than ever to participate in stock trading and option trading. A report from Bloomberg intelligence showed that during the first 6 months of 2020, retail investors accounted for almost 20% of all stock market shares traded. This is almost double the amount from only 10 years before [@arora]. This surge in retail investing only increased during the CoVID-19 Pandemic. In January of 2021, the stock market, especially "meme stocks" such as AMC and GME, soared due to a combination of "stimulus checks, boredom, and social media." [@arrora] As a part of this surge in retail investing, more interest has been shown to the investments of our elected political officials. Rep. Nancy Pelosi is known as one of the savviest investors in congress. She consistently outperforms the market and in Q4 of 2021, her portfolio grew over 96% gaining over \$62 million [@fineprint2021]. This level of investing seems impressive, but to many, the trades our congressional representatives make could be tainted by their influence over policy. There were many articles written during the initial CoVID-19 wave about the insider-trading done by representatives who knew that the pandemic was coming before mainstream media, and used it as an opportunity to make obscene amounts of money. From the Wake Forest Law Review, Senator Richard Burr made over \$600,000 dumping personal holdings in early February, after making a speech one week earlier about how the "United Stats today is better prepared than ever before to face emerging public health threats." This dump in personal holdings occurred just one week before the stock markets began to trend downward in response to the spread of the Coronavirus [@congress]. All of these articles and the continued growth of retail investing has lead to the investigation in the trends in congressional stock trading, especially in conjunction with their influence over public policy that has the potential to create massive profit.
+
+Currently, there are many rules and regulations that govern the disclosure and legality of stock trading by our publicly elected officials. First, according to the Clerk's Office of the US House of Representatives, "Members, officers, and staff of the U.S. House of Representatives are required by certain House Rules and federal statutes to file official documents on travel, income, gifts, etc. and to make this information available to the public as Public Disclosure documents." [@officeo] These reporting requirements were established with the STOCK Act (Stop Trading on Congressional Knowledge) in 2012. The bill was introduced following a report "highlighting stock trading by member of Congress and suggesting that they were not subject to laws barring trading on material non-public information obtained in the course of offical duties." [@stockact] Although the act passed with overwhelming bipartisan support, compliance has been "spotty" with news organizations identifying 55 members of congress in 2021 who violated the reporting requirements. The only fine associated with a violation is \$200, next to nothing compared with the potential value of these lucrative trades, many of which are valued over \$100,000.
+
+# Goals
+
+The goal of this report is to delve into the publicly available disclosure data from the US House of Representative stock trades. I am interested in how members of the House, specifically those on special committees, trade and invest in the days leading up to major events in a bill's life cycle, from introduction to the House, to signing by the President.
+
+The two bills in particular I will be looking at within the last four years are the CARES Act, and the CHIPS and Science Act.
+
+The CARES Act (Coronavirus Aid, Relief, and Economic Security Act) was a bill passed in March of 2020. This bill's goal was to respond to CoVID-19 and try to lessen its impact on the economy, public health, state and local governments, individuals, and businesses.
+
+The CHIPS for America Fund is established by HR 4346. It is a lengthy bill, but in summary its aim is to provide funding to support the domestic production of semiconductors. It aims to provide funding for wireless supply chain innovation, establish an advanced manufacturing tax credit, increased research and development to expand knowledge of nuclear materials for the benefit of commerce, medicine and national security, creates the Carbon Materials Science Initiative, and much more. [@chipsact] Overall, this bill is a huge benefit to science and technology opportunities in the United States, and has the potential to create a lot of funding opportunities for private companies. This potential funding definitely could impact the stock prices of publicly traded companies that have a role in the tech sector.
 
 # Data Collection
 
 The data I am using comes from housestockwatcher.com [@officeo]. This website uses an api to collect the data from Clerks of the United States House of Representatives public disclosure website. From the Clerks website, "Members, officers, and staff of the U.S. House of Representatives are required by certain House Rules and federal statutes to file official documents on travel, income, gifts, etc. and to make this information available to the public as Public Disclosure documents."
 
 ```{r Data Download, include=FALSE}
-stock_data <- read_csv(file = "https://house-stock-watcher-data.s3-us-west-2.amazonaws.com/data/all_transactions.csv")
+stock_data <- read_csv(file = "../Data/all_transactions.csv")
 ```
 
 Below is the initial raw data from the website. There are 12 variables initially: disclosure_year, disclosure_date, transaction_data, owner, ticker, asset_description, type, amount, representative, district, ptr_link, and cap_gains_over_200_USD. Initial exploration of the breakdown of trades is interesting. The vast majority of trades are the two lowest categories (1001-15000 and 15001-50000).
@@ -41,12 +53,15 @@ Below is the initial raw data from the website. There are 12 variables initially
 From here, I would like to clean the data set up. Make the dates dates, and then split the amount into a lower and upper bound limit. Right now it is kind of clunky and I'm not sure if it should be a category or treated as an amount since they don't disclose the actual amount, just the range within which it falls.
 
 ### Stock Data
+
 ```{r warning=FALSE}
 #Parse Dates
 stock_data_clean <- stock_data %>% 
-  mutate(transaction_date = lubridate::parse_date_time(transaction_date, "%Y-%m-%d"),
-         disclosure_date = lubridate::parse_date_time(disclosure_date, "%m/%d/%Y")) %>% 
-  filter(transaction_date > "2018-01-01") %>% 
+  mutate(transaction_date = lubridate::parse_date_time(transaction_date, "%m/%d/%Y"),
+         disclosure_date = lubridate::parse_date_time(disclosure_date, "%m/%d/%Y"),
+         transaction_date = as.Date(transaction_date),
+         disclosure_date = as.Date(disclosure_date)) %>% 
+  filter(transaction_date > '2018-01-01') %>% 
 #Here purchases are made 1's, sales are made 0's
   mutate(type = if_else(type == "purchase",1, 0)) %>% 
   separate(col = "amount", into = c("lower_amount", "upper_amount"), sep = "-") %>% 
@@ -82,12 +97,14 @@ trading_days_of_interest <- trading_volume_by_day %>%
 ```
 
 ### Vote Data
+
 ```{r}
 #This is vote data for Bill Passages during the timeframe of the data
 vote_data <- read_csv(file = "../Data/Hall_rollcalls.csv")
 
 vote_data_clean <- vote_data %>% 
-  mutate(date = parse_date(date, format = "%m/%d/%Y")) %>% 
+  mutate(date = parse_date(date, format = "%m/%d/%Y"),
+         date = as.Date(date)) %>% 
   filter(date > "2018-01-01") %>% 
   select(-c(chamber, clerk_rollnumber, yea_count, nay_count, nominate_mid_1, nominate_mid_2, nominate_spread_1, nominate_spread_2, nominate_log_likelihood, vote_result, dtl_desc, rollnumber, session)) %>% 
   filter(vote_question == "On Passage")
@@ -97,7 +114,6 @@ vote_data_clean <- vote_data %>%
 vote_days_of_interest <- vote_data_clean %>% 
   filter(date %in% trading_days_of_interest$transaction_date)
 ```
-
 
 ```{r}
 #This plot shows bill passage votes as v-lines over the daily stock trading volume by congressional representatives
@@ -110,16 +126,20 @@ plot1 <- stock_data_clean %>%
                   color = "red")) +
     theme(legend.position = "none")
 
+print(plot1)
+
 ggsave(filename = "plot1.png", plot = plot1, width = 44.45, height = 27.78, units = "cm", dpi=300)
 ```
 
+# Analysis
 
-# Plots by Year
+## Plots by Year
 
-## 2018 Plot
+### 2018 Plot
+
 ```{r}
 plot2 <- stock_data_clean %>%
-  filter(transaction_date %in% trading_days_of_interest$transaction_date) %>% 
+  #filter(transaction_date %in% trading_days_of_interest$transaction_date) %>% 
   group_by(transaction_date) %>% 
   filter(between(transaction_date, as.Date('2018-01-01'), as.Date('2018-12-31'))) %>% 
   ggplot()+
@@ -135,7 +155,8 @@ plot2 <- stock_data_clean %>%
 ggsave(filename = "../Plots/plot2.png", plot = plot2, width = 44.45, height = 27.78, units = "cm", dpi=300)
 ```
 
-## 2019 Plot
+### 2019 Plot
+
 ```{r}
 
 plot3 <- stock_data_clean %>%
@@ -152,11 +173,12 @@ plot3 <- stock_data_clean %>%
     scale_fill_discrete(name = "Color", labels = "Vote Passage Day")+
     theme(legend.position = "none")
 
-ggsave(filename = "../Plots/plot3.png", plot = plot3, width = 44.45, height = 27.78, units = "cm", dpi=300)
+print(plot3)
 
 ```
 
-## 2020 Plot
+### 2020 Plot
+
 ```{r}
 
 plot4 <- stock_data_clean %>%
@@ -173,11 +195,12 @@ plot4 <- stock_data_clean %>%
     scale_fill_discrete(name = "Color", labels = "Vote Passage Day")+
     theme(legend.position = "none")
 
-ggsave(filename = "../Plots/plot4.png", plot = plot4, width = 44.45, height = 27.78, units = "cm", dpi=300)
+print(plot4)
 
 ```
 
-## 2021 Plot
+### 2021 Plot
+
 ```{r}
 
 plot5 <- stock_data_clean %>%
@@ -194,11 +217,12 @@ plot5 <- stock_data_clean %>%
     scale_fill_discrete(name = "Color", labels = "Vote Passage Day") +
     theme(legend.position = "none")
 
-ggsave(filename = "../Plots/plot5.png", plot = plot5, width = 44.45, height = 27.78, units = "cm", dpi=300)
+print(plot5)
 
 ```
 
-## 2022 Plot
+### 2022 Plot
+
 ```{r}
 
 plot6 <- stock_data_clean %>%
@@ -215,10 +239,11 @@ plot6 <- stock_data_clean %>%
     scale_fill_discrete(name = "Color", labels = "Vote Passage Day") + 
     theme(legend.position = "none")
 
-ggsave(filename = "../Plots/plot6.png", plot = plot6, width = 44.45, height = 27.78, units = "cm", dpi=300)
+print(plot6)
 ```
 
 # Identfying Bills Voted on For High Trading Volume Days
+
 ```{r}
 bill_passages_of_interest <- vote_data_clean %>% 
   filter(date %in% trading_days_of_interest$transaction_date) %>% 
@@ -239,6 +264,7 @@ date_ranges_full <- vote_data_clean %>%
 ```
 
 Trading Volume 30 Days Before Vote Passage
+
 ```{r}
 vote_plots <- list()
 left_dates <- unique(date_ranges_full$left_date)
@@ -268,42 +294,40 @@ for (i in 1:218) {
    daily_trading_average <- 15.89
    x <- stock_data_clean %>% 
      filter(between(transaction_date, as.Date(left_date), as.Date(date_))) 
-    plot.1 <- ggplot(data = x)+
-      geom_bar(mapping = aes(x = transaction_date, fill = amount_cat))+
-      ggtitle(date_)+
-      xlab("Transaction Date")+
-      ylab("Count")+
-      geom_hline(yintercept = daily_trading_average)+
-      scale_fill_discrete(name = "Amount Category")
-    
-    values <- x %>%
-      group_by(amount_cat) %>%
-      summarize(count = n())
+   print(x)
+  plot.1 <- ggplot(data = x)+
+    geom_bar(mapping = aes(x = transaction_date, fill = amount_cat))+
+    ggtitle(date_)+
+    xlab("Transaction Date")+
+    ylab("Count")+
+    geom_hline(yintercept = daily_trading_average)+
+    scale_fill_discrete(name = "Amount Category")
+  
+  values <- x %>%
+    group_by(amount_cat) %>%
+    summarize(count = n())
 
-    # plot.2 <- ggplot(data = values, aes(x="", y = count))+
-    #   geom_bar(stat="identity", width=1) +
-    #   coord_polar("y", start=0)+
-    #   theme_void()+
-    #   ggtitle("Breakdown by Amount Category")
-    
-    plot.3 <- x %>%
-      group_by(ticker) %>%
-      summarize(count = n()) %>%
-      filter(count > 2) %>%
-      ggplot()+
-        geom_col(mapping = aes(x = ticker, y = count))+
-        ggtitle(date_)+
-        xlab("Stock Ticker")+
-        ylab("Count")+
-        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  plot.3 <- x %>%
+    group_by(ticker) %>%
+    summarize(count = n()) %>%
+    filter(count > 2) %>%
+    ggplot()+
+      geom_col(mapping = aes(x = ticker, y = count))+
+      ggtitle(date_)+
+      xlab("Stock Ticker")+
+      ylab("Count")+
+      theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
    
    print(plot.1)
-   # print(plot.2)
    print(plot.3)
  }
+
+monthly_trade_vol("2020-03-27")
+monthly_trade_vol("2021-07-28")
 ```
 
 Creating a function ro allow me to search by representative.
+
 ```{r}
 rep_search <- function(rep_last_name){ 
   rep_transactions <- filter(stock_data_clean, grepl(rep_last_name, representative))
@@ -314,30 +338,102 @@ rep_search <- function(rep_last_name){
 ```
 
 CARES Act
+
 ```{r}
 ways_means_members <- c("Richard Neal", "Lloyd Doggett", "Mike Thompson", "John Larson", "Earl Blumenauer", "Ron Kind", "Bill Pascrell", " Danny Davis", "Linda Sanchez", "Brian Higgins", "Terri Sewell", "Suzan DelBene", "Judy Chu", "Gwen Moore", "Dan Kildee", "Brendan Boyle", "Don Beyer", "Dwigth Evans", "Brad Schneider", "Tom Suozzi", "Jimmy Panetta", "Stephanie Murphy", "Jimmy Gomez", "Steven Horsford", "Cedric Richmond", "Kevin Brady", "Devin Nunes", "Vern Buchanan", "Adrian Smith", "Kenny Marchant", "Tom Reed", "Mike Kelly", "George Holdings", "Jason Smith", "tom Rice", "David Schweikert", "Jackie Walorski", "Darin Lahood", "Brad Wenstrup", "Jodey Arrington", "Drew Ferguson", "Ron Estes")
 
 cares_act_data <- bind_rows(lapply(ways_means_members, rep_search))
 
-cares_dates <- c("3/27/2020", "3/27/2020", "3/27/2020", "3/27/2020", "3/25/2020", "7/17/2019", "1/24/2019")
+cares_dates <- c("3/27/2020", "3/25/2020", "7/17/2019", "1/24/2019")
 
 cares_dates <- mdy(cares_dates)
+
+ cares_act_monthly <- function(date_){
+   left_date <- as.Date(date_) - days(120)
+   daily_trading_average <- 15.89
+   x <- cares_act_data %>% 
+     filter(between(transaction_date, as.Date(left_date), as.Date(date_))) 
+    plot.1 <- ggplot(data = x)+
+      geom_bar(mapping = aes(x = transaction_date, fill = amount_cat))+
+      ggtitle(date_)+
+      xlab("Transaction Date")+
+      ylab("Count")+
+      geom_hline(yintercept = daily_trading_average)+
+      scale_fill_discrete(name = "Amount Category")
+
+    values <- x %>%
+      group_by(amount_cat) %>%
+      summarize(count = n())
+ 
+    plot.3 <- x %>%
+      group_by(ticker) %>%
+      summarize(count = n()) %>%
+      filter(count > 0) %>%
+      ggplot()+
+        geom_col(mapping = aes(x = ticker, y = count))+
+        ggtitle(date_)+
+        xlab("Stock Ticker")+
+        ylab("Count")+
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+   
+   print(plot.1)
+   print(plot.3)
+ }
+ 
+lapply(cares_dates, cares_act_monthly)
 ```
 
 Chips and Science Act
+
 ```{r}
 app_com_members <- c("McCollum", "Ryan", "Ruppersberger", "Kaptur", "Cuellar", "Kilmer", "Aguilar", "Bustos", "Crist", "Kirkpatrick", "Calvert", "Rogers", "Cole", "Womack", "Aderholt", "Carter", "Diaz")
 
 chips_data <- bind_rows(lapply(app_com_members, rep_search))
 
-chips_dates <- c("8/9/2022", "8/9/2022", "8/2/2022", "7/28/2022", "7/27/2022", "6/22/2022", "6/22/2022", "7/28/2021", "7/1/2021", "7/1/2021")
+chips_dates <- c("8/9/2022", "8/2/2022", "7/28/2022", "7/27/2022", "6/22/2022", "7/28/2021", "7/1/2021")
 
 chips_dates <- mdy(chips_dates)
+
+chips_act_monthly <- function(date_){
+   left_date <- as.Date(date_) - days(60)
+   daily_trading_average <- 15.89
+   x <- cares_act_data %>% 
+     filter(between(transaction_date, as.Date(left_date), as.Date(date_))) 
+    plot.1 <- ggplot(data = x)+
+      geom_bar(mapping = aes(x = transaction_date, fill = amount_cat))+
+      ggtitle(date_)+
+      xlab("Transaction Date")+
+      ylab("Count")+
+      geom_hline(yintercept = daily_trading_average)+
+      scale_fill_discrete(name = "Amount Category")
+
+    values <- x %>%
+      group_by(amount_cat) %>%
+      summarize(count = n())
+ 
+    plot.3 <- x %>%
+      group_by(ticker) %>%
+      summarize(count = n()) %>%
+      filter(count > 0) %>%
+      ggplot()+
+        geom_col(mapping = aes(x = ticker, y = count))+
+        ggtitle(date_)+
+        xlab("Stock Ticker")+
+        ylab("Count")+
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+   
+   print(plot.1)
+   print(plot.3)
+ }
+ 
+ lapply(chips_dates, chips_act_monthly)
+
+
 ```
 
 Looking at the committee that submitted the CHIPS and Science Act, there were not very many members who participated in stock trading throughout this timeline
 
-The second lapply is looking at ways and means members.  I'll be looking specifically at the CARES Act.
+The second lapply is looking at ways and means members. I'll be looking specifically at the CARES Act.
 
 # Path Forward
 
