@@ -22,25 +22,27 @@ library(tidyverse)
 
 \newpage
 
-# Issue
+# Introduction
 
-Stock trading and investing can be lucrative ways to make money without much effort. Especially within the last two years, so-called retail investors (individuals who buy/sell securities as a non-professional) have begun to see more news with their influence on the market. With the development of easy trading technology and apps such as Robinhood, it is now easier than ever to participate in stock trading and option trading. A report from Bloomberg intelligence showed that during the first 6 months of 2020, retail investors accounted for almost 20% of all stock market shares traded. This is almost double the amount from only 10 years before [@arora]. This surge in retail investing only increased during the CoVID-19 Pandemic. In January of 2021, the stock market, especially "meme stocks" such as AMC and GME, soared due to a combination of "stimulus checks, boredom, and social media." [@arrora] As a part of this surge in retail investing, more interest has been shown to the investments of our elected political officials. Rep. Nancy Pelosi is known as one of the savviest investors in congress. She consistently outperforms the market and in Q4 of 2021, her portfolio grew over 96% gaining over \$62 million [@fineprint2021]. This level of investing seems impressive, but to many, the trades our congressional representatives make could be tainted by their influence over policy. There were many articles written during the initial CoVID-19 wave about the insider-trading done by representatives who knew that the pandemic was coming before mainstream media, and used it as an opportunity to make obscene amounts of money. From the Wake Forest Law Review, Senator Richard Burr made over \$600,000 dumping personal holdings in early February, after making a speech one week earlier about how the "United Stats today is better prepared than ever before to face emerging public health threats." This dump in personal holdings occurred just one week before the stock markets began to trend downward in response to the spread of the Coronavirus [@congress]. All of these articles and the continued growth of retail investing has lead to the investigation in the trends in congressional stock trading, especially in conjunction with their influence over public policy that has the potential to create massive profit.
+## Issue
+
+Stock trading and investing can be lucrative ways to make money without much effort. Especially within the last two years, so-called retail investors (individuals who buy/sell securities as a non-professional) have begun to see more news with their influence on the market. With the development of easy trading technology and apps such as Robinhood, it is now easier than ever to participate in stock trading and option trading. A report from Bloomberg intelligence showed that during the first 6 months of 2020, retail investors accounted for almost 20% of all stock market shares traded. This is almost double the amount from only 10 years before [@arora]. This surge in retail investing only increased during the CoVID-19 Pandemic. In January of 2021, the stock market, especially "meme stocks" such as AMC and GME, soared due to a combination of "stimulus checks, boredom, and social media." [@arora] As a part of this surge in retail investing, more interest has been shown to the investments of our elected political officials. Rep. Nancy Pelosi is known as one of the savviest investors in congress. She consistently outperforms the market and in Q4 of 2021, her portfolio grew over 96% gaining over \$62 million [@fineprint2021]. This level of investing seems impressive, but to many, the trades our congressional representatives make could be tainted by their influence over policy. There were many articles written during the initial CoVID-19 wave about the insider-trading done by representatives who knew that the pandemic was coming before mainstream media, and used it as an opportunity to make obscene amounts of money. From the Wake Forest Law Review, Senator Richard Burr made over \$600,000 dumping personal holdings in early February, after making a speech one week earlier about how the "United Stats today is better prepared than ever before to face emerging public health threats." This dump in personal holdings occurred just one week before the stock markets began to trend downward in response to the spread of the Coronavirus [@covidtrading]. All of these articles and the continued growth of retail investing has lead to the investigation in the trends in congressional stock trading, especially in conjunction with their influence over public policy that has the potential to create massive profit.
 
 Currently, there are many rules and regulations that govern the disclosure and legality of stock trading by our publicly elected officials. First, according to the Clerk's Office of the US House of Representatives, "Members, officers, and staff of the U.S. House of Representatives are required by certain House Rules and federal statutes to file official documents on travel, income, gifts, etc. and to make this information available to the public as Public Disclosure documents." [@officeo] These reporting requirements were established with the STOCK Act (Stop Trading on Congressional Knowledge) in 2012. The bill was introduced following a report "highlighting stock trading by member of Congress and suggesting that they were not subject to laws barring trading on material non-public information obtained in the course of offical duties." [@stockact] Although the act passed with overwhelming bipartisan support, compliance has been "spotty" with news organizations identifying 55 members of congress in 2021 who violated the reporting requirements. The only fine associated with a violation is \$200, next to nothing compared with the potential value of these lucrative trades, many of which are valued over \$100,000.
 
-# Goals
+## Goals
 
 The goal of this report is to delve into the publicly available disclosure data from the US House of Representative stock trades. I am interested in how members of the House, specifically those on special committees, trade and invest in the days leading up to major events in a bill's life cycle, from introduction to the House, to signing by the President.
 
 The two bills in particular I will be looking at within the last four years are the CARES Act, and the CHIPS and Science Act.
 
-The CARES Act (Coronavirus Aid, Relief, and Economic Security Act) was a bill passed in March of 2020. This bill's goal was to respond to CoVID-19 and try to lessen its impact on the economy, public health, state and local governments, individuals, and businesses.
+The CARES Act (Coronavirus Aid, Relief, and Economic Security Act) was a bill passed in March of 2020. This bill's goal was to respond to CoVID-19 and try to lessen its impact on the economy, public health, state and local governments, individuals, and businesses. Overall, this bill had the main goal of boosting the economy, and ensuring that small businesses and people in America were less severely impacted by the impending lockdown. The bill specified appropriations for paycheck protection loans, salaries and expenses, grants for entrepreneurial development, emergency disaster loans, and subsidies for loan payments. [@caresact] The CARES Act definitely had the potential to be exploited for personal gain through stock trading.
 
 The CHIPS for America Fund is established by HR 4346. It is a lengthy bill, but in summary its aim is to provide funding to support the domestic production of semiconductors. It aims to provide funding for wireless supply chain innovation, establish an advanced manufacturing tax credit, increased research and development to expand knowledge of nuclear materials for the benefit of commerce, medicine and national security, creates the Carbon Materials Science Initiative, and much more. [@chipsact] Overall, this bill is a huge benefit to science and technology opportunities in the United States, and has the potential to create a lot of funding opportunities for private companies. This potential funding definitely could impact the stock prices of publicly traded companies that have a role in the tech sector.
 
 # Data Collection
 
-The data I am using comes from housestockwatcher.com [@officeo]. This website uses an api to collect the data from Clerks of the United States House of Representatives public disclosure website. From the Clerks website, "Members, officers, and staff of the U.S. House of Representatives are required by certain House Rules and federal statutes to file official documents on travel, income, gifts, etc. and to make this information available to the public as Public Disclosure documents."
+The data used comes from housestockwatcher.com [@officeo]. This website uses an api to collect the data from Clerks of the United States House of Representatives public disclosure website. The creator of the website compiles all individually registered documents from the Clerks website, and created a transactions csv file with all stock/option trades registered.
 
 ```{r Data Download, include=FALSE}
 stock_data <- read_csv(file = "../Data/all_transactions.csv")
@@ -48,13 +50,15 @@ stock_data <- read_csv(file = "../Data/all_transactions.csv")
 
 Below is the initial raw data from the website. There are 12 variables initially: disclosure_year, disclosure_date, transaction_data, owner, ticker, asset_description, type, amount, representative, district, ptr_link, and cap_gains_over_200_USD. Initial exploration of the breakdown of trades is interesting. The vast majority of trades are the two lowest categories (1001-15000 and 15001-50000).
 
-## Cleaning the Data
+```{r}
+head(stock_data)
+```
 
-From here, I would like to clean the data set up. Make the dates dates, and then split the amount into a lower and upper bound limit. Right now it is kind of clunky and I'm not sure if it should be a category or treated as an amount since they don't disclose the actual amount, just the range within which it falls.
+## Stock Data
 
-### Stock Data
+The data initially requires some cleaning. As we are interested in trading trends leading up to specific dates, the lubridates package was essential in ensuring accurate and useful date formatting for the transaction_date column. I also created a new categorical variable that corresponds to the transaction amount. Category 1 trades are between \$1000 and \$15,000. Category 2 trades are from \$15,000 to \$50,000. Category 3 trades are from \$50,000 to \$100,000. Category 4 trades are above \$100,000. I also took this time to clean up the stock ticker column by removing any spaces, and strange character formatting I found in the data. I also removed any transactions that had an NA within the ticker column. The final cleaned stock data contains all transactions from 2018 on. This is over 14,500 observations. Below is an example of the cleaned stock trading data.
 
-```{r warning=FALSE}
+```{r cleaning stock data, echo=FALSE, warning=FALSE}
 #Parse Dates
 stock_data_clean <- stock_data %>% 
   mutate(transaction_date = lubridate::parse_date_time(transaction_date, "%m/%d/%Y"),
@@ -78,11 +82,13 @@ stock_data_clean <- stock_data %>%
   mutate(ticker = as.character(gsub('[--]', '', ticker)),
          ticker = as.character(gsub("^$|^ $", NA, ticker))) %>% 
   filter(ticker != "NA")
+
+head(stock_data_clean)
   
 
 ```
 
-```{r}
+```{r Daily Trading Volume, include=FALSE}
 #Calculating Average Trading Volume by Day
 trading_volume_by_day <- stock_data_clean %>% 
   group_by(transaction_date) %>% 
@@ -90,15 +96,23 @@ trading_volume_by_day <- stock_data_clean %>%
 
 median(trading_volume_by_day$n)
 daily_trading_average <- mean(trading_volume_by_day$n)
+```
 
+A value that I knew would be of interest was the average daily trading volume for the data. This measurement could be use to identify days where trading was abnormally high. I found this value by grouping the transactions by the date, and counting the number of trades by day. I then found the mean and median of this value. The median daily trading volume was 11 and the mean was `r round(daily_trading_average, digits = 2)`. I then created a data frame that showed the days where trading was above this average.
+
+```{r trading days of interest, include=FALSE}
 trading_days_of_interest <- trading_volume_by_day %>% 
   filter(n > daily_trading_average) %>% 
   select(transaction_date)
+
+head(trading_days_of_interest)
 ```
 
-### Vote Data
+## Vote Data
 
-```{r}
+The next data frame I created was a history of vote data from the house of representatives. This data, in conjunction with detailed information from the House of Representative individual Bill records, will help feed into the dates selected for overall analysis. Voteview is a resource that allows you to select the voting records for either the House or the Senate, going all the way back to 1789. [@voteview] I used this tool to create the following data frame. Cleaning the data involved parsing dates, removing columns that were of little use, and filtering so only votes since 2018 were present.
+
+```{r cleaning vote data, echo=FALSE}
 #This is vote data for Bill Passages during the timeframe of the data
 vote_data <- read_csv(file = "../Data/Hall_rollcalls.csv")
 
@@ -108,14 +122,24 @@ vote_data_clean <- vote_data %>%
   filter(date > "2018-01-01") %>% 
   select(-c(chamber, clerk_rollnumber, yea_count, nay_count, nominate_mid_1, nominate_mid_2, nominate_spread_1, nominate_spread_2, nominate_log_likelihood, vote_result, dtl_desc, rollnumber, session)) %>% 
   filter(vote_question == "On Passage")
+
+head(vote_data_clean)
 ```
 
-```{r}
+In addition, I used the trading days of interest data from the stock data to look at days where there was an important vote on passage of a bill that took place on a day where stock trading was above average as well. There were 63 total days since 2018 where this occurred.
+
+```{r vote days of interest, echo=FALSE}
 vote_days_of_interest <- vote_data_clean %>% 
   filter(date %in% trading_days_of_interest$transaction_date)
+
+head(vote_days_of_interest)
 ```
 
-```{r}
+# Analysis
+
+The first step in my analysis was to look at the overall stock trading trends in conjunction with bill passage. Below is a plot showing the overall daily trading volume with red vertical lines for days when a bill was passed. As can be seen, this graph is incredibly cluttered.
+
+```{r overall plot, echo=FALSE}
 #This plot shows bill passage votes as v-lines over the daily stock trading volume by congressional representatives
 plot1 <- stock_data_clean %>% 
   group_by(transaction_date) %>% 
@@ -128,16 +152,15 @@ plot1 <- stock_data_clean %>%
 
 print(plot1)
 
-ggsave(filename = "plot1.png", plot = plot1, width = 44.45, height = 27.78, units = "cm", dpi=300)
 ```
-
-# Analysis
 
 ## Plots by Year
 
-### 2018 Plot
+Below are four plots that show the breakdown by individual year overlayed with voting days of interest. Even from these simple yearly plots, it is easy to see how much more trading was done in 2019-2022 than in 2018. This shows that retail investing increases discussed earlier also apply to our elected officials.
 
-```{r}
+### 2018-2019 Plots
+
+```{r include=FALSE}
 plot2 <- stock_data_clean %>%
   #filter(transaction_date %in% trading_days_of_interest$transaction_date) %>% 
   group_by(transaction_date) %>% 
@@ -152,12 +175,9 @@ plot2 <- stock_data_clean %>%
     scale_fill_discrete(name = "Color", labels = "Vote Passage Day")+
     theme(legend.position = "none")
 
-ggsave(filename = "../Plots/plot2.png", plot = plot2, width = 44.45, height = 27.78, units = "cm", dpi=300)
 ```
 
-### 2019 Plot
-
-```{r}
+```{r include=FALSE}
 
 plot3 <- stock_data_clean %>%
   filter(transaction_date %in% trading_days_of_interest$transaction_date) %>% 
@@ -173,13 +193,18 @@ plot3 <- stock_data_clean %>%
     scale_fill_discrete(name = "Color", labels = "Vote Passage Day")+
     theme(legend.position = "none")
 
+
+```
+
+```{r echo=FALSE, fig.show="hold", out.width="50%"}
+print(plot2)
 print(plot3)
 
 ```
 
-### 2020 Plot
+### 2020-2021 Plot
 
-```{r}
+```{r echo=FALSE}
 
 plot4 <- stock_data_clean %>%
   filter(transaction_date %in% trading_days_of_interest$transaction_date) %>% 
@@ -195,13 +220,10 @@ plot4 <- stock_data_clean %>%
     scale_fill_discrete(name = "Color", labels = "Vote Passage Day")+
     theme(legend.position = "none")
 
-print(plot4)
 
 ```
 
-### 2021 Plot
-
-```{r}
+```{r echo=FALSE}
 
 plot5 <- stock_data_clean %>%
   filter(transaction_date %in% trading_days_of_interest$transaction_date) %>% 
@@ -217,13 +239,17 @@ plot5 <- stock_data_clean %>%
     scale_fill_discrete(name = "Color", labels = "Vote Passage Day") +
     theme(legend.position = "none")
 
+```
+
+```{r echo=FALSE, figures-side, fig.show="hold", out.width="50%"}
+print(plot4)
 print(plot5)
 
 ```
 
 ### 2022 Plot
 
-```{r}
+```{r echo=FALSE, fig.show="hold", out.width="50%"}
 
 plot6 <- stock_data_clean %>%
   filter(transaction_date %in% trading_days_of_interest$transaction_date) %>% 
@@ -240,11 +266,15 @@ plot6 <- stock_data_clean %>%
     theme(legend.position = "none")
 
 print(plot6)
+
+
 ```
 
-# Identfying Bills Voted on For High Trading Volume Days
+## Identifying Bills Voted on For High Trading Volume Days
 
-```{r}
+Looking at trading trends and what separates good traders from great traders is their ability to anticipate market changes and volatility. My hypothesis was that congressional members would use their knowledge of upcoming bill votes and trade early before the announcement. I assumed that a 30 day window would be a useful time frame to look at when conducting this analysis. Based on the vote data, I found that there were 218 unique days where bills were passed. I looped the cleaned stock data through these days, looking at trading trends for all 218 days and the 30 days leading up to them.
+
+```{r include=FALSE}
 bill_passages_of_interest <- vote_data_clean %>% 
   filter(date %in% trading_days_of_interest$transaction_date) %>% 
   select(c(date, vote_desc)) %>% 
@@ -263,9 +293,9 @@ date_ranges_full <- vote_data_clean %>%
 
 ```
 
-Trading Volume 30 Days Before Vote Passage
+Below are two examples of these 218 plots. The first is from 2021-04-16, the Workplace Violence Prevention for Health Care and Social Service Workers Act. The second plot is from 2022-05-13, the Comprehensive Debt Collection Improvement Act. This information is useful for the lead up to the votes on the bill's passage, but does not answer the question on how trading trends leading up to all the votes that go into a bill's cycle, including introduction, passage, senate passage, and signing by the president.
 
-```{r}
+```{r include=FALSE}
 vote_plots <- list()
 left_dates <- unique(date_ranges_full$left_date)
 main_date <- unique(date_ranges_full$date)
@@ -278,23 +308,30 @@ stock_data_clean %>%
 
 for (i in 1:218) {
   x <- stock_data_clean %>%
-    group_by(transaction_date) %>% 
+    group_by(transaction_date) %>%
     filter(between(transaction_date, as.Date(left_dates[i]), as.Date(main_date[i])))
-  vote_plots[[dates]] = ggplot(data = x) + geom_bar(mapping = aes(x = transaction_date)) + ggtitle(main_date[i]) + xlab("Transaction Date") + ylab("Count") + geom_hline(yintercept = daily_trading_average, color = "blue")
-  print(vote_plots[[dates]])
-  ggsave(vote_plots[[dates]], file = paste0("../Plots/", "plot_", main_date[i], ".png"), width = 44.45, height = 27.78, units = "cm", dpi=300)
+  vote_plots[[i]] = ggplot(data = x) + geom_bar(mapping = aes(x = transaction_date)) + ggtitle(main_date[i]) + xlab("Transaction Date") + ylab("Count") + geom_hline(yintercept = daily_trading_average, color = "blue")
 }
-
 
 ```
 
-```{r}
+```{r echo=FALSE, fig.show="hold", out.width="50%"}
+
+print(vote_plots[150])
+print(vote_plots[200])
+```
+
+## Function Creation
+
+As I continued to go through the previous steps of analysis, I identified a need to create a function that would allow me to enter in any date, not just ones from the voting data, and get an output of the stock trading data for the previous 30 days. The lead to the creation of the monthly trading volume function. This takes a user inputted date in the "YYYY-MM-DD" format, and produces two plots. The first shows daily trading volume for the 30 days leading up to the inputted date, and also a break down of the stock tickers traded during that time period. Below are two example days.
+
+```{r include=FALSE}
  monthly_trade_vol <- function(date_){
    left_date <- as.Date(date_) - days(30)
    daily_trading_average <- 15.89
    x <- stock_data_clean %>% 
      filter(between(transaction_date, as.Date(left_date), as.Date(date_))) 
-   print(x)
+
   plot.1 <- ggplot(data = x)+
     geom_bar(mapping = aes(x = transaction_date, fill = amount_cat))+
     ggtitle(date_)+
@@ -322,13 +359,19 @@ for (i in 1:218) {
    print(plot.3)
  }
 
+```
+
+```{r echo=FALSE, fig.show="hold", out.width="50%"}
 monthly_trade_vol("2020-03-27")
+```
+
+```{r echo=FALSE, fig.show="hold", out.width="50%"}
 monthly_trade_vol("2021-07-28")
 ```
 
-Creating a function ro allow me to search by representative.
+From here a function was then created that allowed representative searching. From the information on committee membership, I was able to search for all members of the committees involved in the creation of the two bills of interest.
 
-```{r}
+```{r include=FALSE}
 rep_search <- function(rep_last_name){ 
   rep_transactions <- filter(stock_data_clean, grepl(rep_last_name, representative))
   
@@ -337,14 +380,16 @@ rep_search <- function(rep_last_name){
 }
 ```
 
-CARES Act
+## CARES Act
 
-```{r}
+My analysis on the trading trends leading up to the passage of the CARES Act began with figuring out who was on the committee responsible for the Bill's introduction. I found that during the 116th Congress (Congress in power when the bill was passed) there were 42 member of the Ways and Means Committee. [@waysandmeans] I filtered the initial stock data for just these members stock trading information. This subset of transactions involved 405 total transactions. I then used the bill information from Congress do pick dates of interest for the bill's life cycle. [@caresact] The dates of interest were 2019-01-24, 2019-07-17, 2020-03-25, and 2020-03-27. These line up with the date it was introduced to the House, date it passed the House, date if passed the Senate, and date it was signed by the President into Public Law. Below are the eight plots for the four days listed. These show stock trading volume by the members of the committee 30 days prior to the dates, as well as major stock tickers traded during that period.
+
+```{r include=FALSE}
 ways_means_members <- c("Richard Neal", "Lloyd Doggett", "Mike Thompson", "John Larson", "Earl Blumenauer", "Ron Kind", "Bill Pascrell", " Danny Davis", "Linda Sanchez", "Brian Higgins", "Terri Sewell", "Suzan DelBene", "Judy Chu", "Gwen Moore", "Dan Kildee", "Brendan Boyle", "Don Beyer", "Dwigth Evans", "Brad Schneider", "Tom Suozzi", "Jimmy Panetta", "Stephanie Murphy", "Jimmy Gomez", "Steven Horsford", "Cedric Richmond", "Kevin Brady", "Devin Nunes", "Vern Buchanan", "Adrian Smith", "Kenny Marchant", "Tom Reed", "Mike Kelly", "George Holdings", "Jason Smith", "tom Rice", "David Schweikert", "Jackie Walorski", "Darin Lahood", "Brad Wenstrup", "Jodey Arrington", "Drew Ferguson", "Ron Estes")
 
 cares_act_data <- bind_rows(lapply(ways_means_members, rep_search))
 
-cares_dates <- c("3/27/2020", "3/25/2020", "7/17/2019", "1/24/2019")
+cares_dates <- c("1/24/2019", "7/17/2019", "3/25/2020", "3/27/2020")
 
 cares_dates <- mdy(cares_dates)
 
@@ -379,18 +424,25 @@ cares_dates <- mdy(cares_dates)
    print(plot.1)
    print(plot.3)
  }
- 
-lapply(cares_dates, cares_act_monthly)
+
 ```
 
-Chips and Science Act
+```{r echo=FALSE, fig.show="hold", message=FALSE, out.width="50%"}
+cares_graphs <- lapply(cares_dates, cares_act_monthly)
+```
 
-```{r}
-app_com_members <- c("McCollum", "Ryan", "Ruppersberger", "Kaptur", "Cuellar", "Kilmer", "Aguilar", "Bustos", "Crist", "Kirkpatrick", "Calvert", "Rogers", "Cole", "Womack", "Aderholt", "Carter", "Diaz")
+As can be seen by the graphs, the first two dates from the bill's introduction and passage through the House showed no trades done by the committee members. And then the following two dates that correspond to the Senate passage and Presidential signing show very little trading. We can see that all days during those periods are much lower than the daily trading average.
+
+## CHIPS and Science Act
+
+For the CHIPS and Science Act, the same formula was followed. The bill was first introduced to the House by the House Appropriations Committee. This committee has 59 members total. [@appropcom] Using the my representative search function, I created a data frame of all transactions made by the committee members. The transactions for these committee members was much higher than the Ways and Means Committee. Roughly 1200 transactions total I then created plots for daily trading volume for the committee members for the month leading up to the same four important dates: House Introduction, House Passage, Senate Passage, and Presidential Signature.
+
+```{r include=FALSE}
+app_com_members <- c("Rosa DeLauro", "Marcy Kaptur", "David Price", "Lucille Roybal-Allard", "Sanford Bishop","Barbara Lee", "Betty McCollum", "Tim Ryan", "Dutch Ruppersberger", "Debbie Wasserman Schultz","Henry Cuellar", "Chellie Pingree", "Mike Quigley", "Derek Kilmer", "Matt Cartwright","Grace Meng", "Mark Pocan", "Katherine Clark", "Pete Aguilar", "Lois Frankel","Cheri Bustos", "Bonnie Watson Coleman", "Brenda Lawrence", "Norma Torres", "Ann Kirkpatrick","Ed Case", "Adriano Espaillat", "Josh Harder", "Jennifer Wexton", "David Trone","Lauren Underwood", "Susie Lee", "Joseph Morelle", "Kay Granger", "Harold Rogers","Robert Aderholt", "Michael Simpson", "John Carter", "Ken Calvert", "Tom Cole","Mario Diaz-Balart", "Steve Womack", "Charles Fleischmann", "Jaime Herrera Beutler","David Joyce", "Andy Harris", "Mark Amodei", "Chris Stewart", "Steven Palazzo","David Valadao", "Dan Newhouse", "John Moolenaar", "John Rutherford", "Ben Cline","Guy Reschenthaler", "Mike Garcia", "Ashley Hinson", "Tony Gonzales", "Julia Letlow")
 
 chips_data <- bind_rows(lapply(app_com_members, rep_search))
 
-chips_dates <- c("8/9/2022", "8/2/2022", "7/28/2022", "7/27/2022", "6/22/2022", "7/28/2021", "7/1/2021")
+chips_dates <- c("7/1/2021", "7/28/2021", "6/22/2022", "8/9/2022")
 
 chips_dates <- mdy(chips_dates)
 
@@ -426,18 +478,41 @@ chips_act_monthly <- function(date_){
    print(plot.3)
  }
  
- lapply(chips_dates, chips_act_monthly)
-
-
 ```
 
-Looking at the committee that submitted the CHIPS and Science Act, there were not very many members who participated in stock trading throughout this timeline
+```{r echo=FALSE, fig.show="hold", message=FALSE, out.width="50%"}
 
-The second lapply is looking at ways and means members. I'll be looking specifically at the CARES Act.
+chips_graphs <- lapply(chips_dates, chips_act_monthly)
+```
 
-# Path Forward
+As can be seen by the graphs, again there does not seem to be any large scale investing done by the committee member in the 30 days leading up to the major dates in the bill's life cycle. During these 30 day windows, the maximum number of transactions total taken place was 16. And looking at the tickers traded during this time, the only one that stood out was IMAX, and that barely was higher than any of the other tickers traded during the time.
 
-Next I'd like to look at a snapshot of the data in reference to important legislation passed within the last three years. I want to categorize the legislation similar to an ETF. Create buckets of technology stocks, healthcare, energy, and other broad categories. Then I'd like to categorize these stocks as well, and look at how the number of trades within those categories changes with relation to the lead-up of the bill passage
+# Conclusion
+
+## Findings / Policy Recommendations
+
+Given a snapshot of two major bills passed since 2018, I was very surprised by the lack of trading involvement of the committee members responsible for the introduction/development of the legislature. From initial reading into the alleged corruption of our congressional representatives, I was expecting to see more obvious signs of misuse of public policy knowledge for personal gain. From analyzing the initial stock trading data, I found that there were only 161 unique Representatives who have registered their trades according to the rules and regulations of the Clerks Office. This number spans two different Congresses as well, the 116th and the 117th. It seems that a lot of the trading is done by a much smaller group of individuals. Out of those 161 representatives, only 82 of them have total transactions over 20 over the course of the four year period of the data.
+
+Before conducting this research, I believed that corruption and insider trading was far more rampant than the data shows. Given this finding, I believe that STOCK Act regulations should be continued to be enforced with the following amendments:
+
+> 1) All transactions registered with the Clerks Office must have the discrete dollar amount associated with the trade,
+>
+> 2) Fines given for violations of rules and regulations should be a percentage of the total value of the trade as opposed to flat fees.
+
+Disclosing the discrete dollar amount would provide more transparency to the American Public as to how much money our representatives are making outside of the salary they are paid for their position. Making fines a percentage of the trades total value would have far more impact than a flat fine. Paying a \$200 fine on a trade valued at tens of thousands of dollars has little to no punitive value.
+
+```{r include=FALSE}
+view(stock_data_clean %>% 
+  group_by(representative) %>% 
+  summarize(count = n()) %>% 
+  arrange(desc(count)))
+```
+
+## Opportunities for Further Research
+
+Given the complexity of this problem, and the amount of data available, there are ample opportunities for expansion within this policy issue. One of the large assumptions as part of analyzing this data is the incorporation of the 30 day window. This assumption limits the amount of transactions within a window, but does it really capture how stock traders trade? Is 30 days enough time to capture any potential trader insights into how a bill will effect the market?
+
+Another option for more in depth analysis would be an analysis of maybe just the larger and more active stock traders within the House of Representatives. As opposed to looking at a bill and its committee first, start with Representatives who are far more active. The 10 representatives who traded the most during this 4 year period are Josh Gottheimer, Gilber Cisneros, Donald Beyer, Alan Lowenthal, Susie Lee, Mark E. Green, Donna Shalala, Greg Gianforte, Dean Philips, and Lois Frankel. Total transactions from this group of Representatives account for over 40% of the total transactions made. Directed research/analysis on these high-volume trading Representatives could lead to more specific insights, especially when compared with their committee membership.
 
 \newpage
 
